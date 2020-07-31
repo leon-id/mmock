@@ -2,6 +2,7 @@ package console
 
 import (
 	"errors"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -182,8 +183,18 @@ func (di *Dispatcher) mappingDeleteHandler(c echo.Context) (err error) {
 }
 
 func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
+	var mock mock.Definition
 
-	mock := &mock.Definition{}
+	if err = json.NewDecoder(c.Request().Body).Decode(&mock) ; err != nil {
+        log.Println("Error in new mock definition: ", err)
+		ar := &ActionResponse{
+			Result: "invalid_mock_definition",
+		}
+		return c.JSON(http.StatusBadRequest, ar)
+	} else {
+        log.Println("New mock definition: ", mock)
+	}
+
 	URI := di.getMappingUri(c.Request().URL.Path)
 
 	if _, ok := di.Mapping.Get(URI); ok {
@@ -193,14 +204,7 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 		return c.JSON(http.StatusConflict, ar)
 	}
 
-	if err = c.Bind(mock); err != nil {
-		ar := &ActionResponse{
-			Result: "invalid_mock_definition",
-		}
-		return c.JSON(http.StatusBadRequest, ar)
-	}
-
-	err = di.Mapping.Set(URI, *mock)
+	err = di.Mapping.Set(URI, mock)
 	if err != nil {
 		return
 	}
@@ -214,7 +218,21 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 
 func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 
-	mock := &mock.Definition{}
+    // TODO: this method totally overwrites mock definition with the new one including defined values taken from the request form and default others,
+    // maybe it should replace only directly defined fields and leave others unchanged
+
+	var mock mock.Definition
+
+	if err = json.NewDecoder(c.Request().Body).Decode(&mock) ; err != nil {
+        log.Println("Error while updating mock definition: ", err)
+		ar := &ActionResponse{
+			Result: "invalid_mock_definition",
+		}
+		return c.JSON(http.StatusBadRequest, ar)
+	} else {
+        log.Println("Updating mock definition: ", mock)
+	}
+
 	URI := di.getMappingUri(c.Request().URL.Path)
 
 	if _, ok := di.Mapping.Get(URI); !ok {
@@ -224,14 +242,7 @@ func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 		return c.JSON(http.StatusNotFound, ar)
 	}
 
-	if err = c.Bind(mock); err != nil {
-		ar := &ActionResponse{
-			Result: "invalid_mock_definition",
-		}
-		return c.JSON(http.StatusBadRequest, ar)
-	}
-
-	err = di.Mapping.Set(URI, *mock)
+	err = di.Mapping.Set(URI, mock)
 	if err != nil {
 		return
 	}

@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"time"
 )
@@ -72,8 +73,13 @@ func (d *Delay) UnmarshalJSON(data []byte) (err error) {
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	case string:
 		s = v.(string)
+	case interface{}:
+        map_, _ := v.(map[string]interface{})
+		s = fmt.Sprintf("%ds", int(map_["Duration"].(float64)))
+        // log.Printf("interface found! %s:, casted as %s", v, s)
 	default:
-		return fmt.Errorf("invalid value for delay, got: %v", reflect.TypeOf(v))
+        log.Printf("%s: invalid value for delay, setting 0sec delay instead of %v", v, reflect.TypeOf(v))
+        s = "0s"
 	}
 
 	d.Duration, err = time.ParseDuration(s)
