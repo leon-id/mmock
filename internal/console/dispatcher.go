@@ -1,8 +1,8 @@
 package console
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -185,14 +185,14 @@ func (di *Dispatcher) mappingDeleteHandler(c echo.Context) (err error) {
 func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 	var mock mock.Definition
 
-	if err = json.NewDecoder(c.Request().Body).Decode(&mock) ; err != nil {
-        log.Println("Error in new mock definition: ", err)
+	if err = json.NewDecoder(c.Request().Body).Decode(&mock); err != nil {
+		log.Println("Error in new mock definition: ", err)
 		ar := &ActionResponse{
 			Result: "invalid_mock_definition",
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	} else {
-        log.Println("New mock definition: ", mock)
+		log.Println("New mock definition: ", mock)
 	}
 
 	URI := di.getMappingUri(c.Request().URL.Path)
@@ -218,19 +218,19 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 
 func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 
-    // TODO: this method totally overwrites mock definition with the new one including defined values taken from the request form and default others,
-    // maybe it should replace only directly defined fields and leave others unchanged
+	// TODO: this method totally overwrites mock definition with the new one including defined values taken from the request form and default others,
+	// maybe it should replace only directly defined fields and leave others unchanged
 
 	var mock mock.Definition
 
-	if err = json.NewDecoder(c.Request().Body).Decode(&mock) ; err != nil {
-        log.Println("Error while updating mock definition: ", err)
+	if err = json.NewDecoder(c.Request().Body).Decode(&mock); err != nil {
+		log.Println("Error while updating mock definition: ", err)
 		ar := &ActionResponse{
 			Result: "invalid_mock_definition",
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	} else {
-        log.Println("Updating mock definition: ", mock)
+		log.Println("Updating mock definition: ", mock)
 	}
 
 	URI := di.getMappingUri(c.Request().URL.Path)

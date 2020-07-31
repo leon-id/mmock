@@ -74,12 +74,12 @@ func (d *Delay) UnmarshalJSON(data []byte) (err error) {
 	case string:
 		s = v.(string)
 	case interface{}:
-        map_, _ := v.(map[string]interface{})
+		map_, _ := v.(map[string]interface{})
 		s = fmt.Sprintf("%ds", int(map_["Duration"].(float64)))
-        // log.Printf("interface found! %s:, casted as %s", v, s)
+		// log.Printf("interface found! %s:, casted as %s", v, s)
 	default:
-        log.Printf("%s: invalid value for delay, setting 0sec delay instead of %v", v, reflect.TypeOf(v))
-        s = "0s"
+		log.Printf("%s: invalid value for delay, setting 0sec delay instead of %v", v, reflect.TypeOf(v))
+		s = "0s"
 	}
 
 	d.Duration, err = time.ParseDuration(s)
